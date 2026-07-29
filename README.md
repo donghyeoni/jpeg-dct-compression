@@ -1,5 +1,7 @@
 # JPEG / DCT Image Compression
 
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg) ![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)
+
 Lossy image compression on the standard **Lena** test image, comparing a
 **custom sum/difference subband decomposition** against a **textbook block-DCT
 JPEG pipeline**. The full coding chain is implemented from scratch: transform,
