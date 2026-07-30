@@ -1,0 +1,31 @@
+Decomposed into 64 subbands of shape (64, 64, 3)
+QP=100: total bits=2330067, rate=8.8885, MSE=829.4964
+
+QP sweep (QP, MSE, rate):
+  139	1548.6146	7.0659
+  160	1968.2862	6.3980
+  192	2576.8226	5.6697
+  240	3326.3734	4.9598
+  310	4055.9806	4.3872
+  450	4750.3334	3.8898
+
+Searching optimal per-subband QP (this is slow)...
+optimal QP (luminance): [96. 21. 19. 19. 19. 19. 18. 17. 22. 20. 19. 19. 17. 19. 18. 17. 19. 19.
+ 17. 19. 19. 19. 18. 19. 18. 19. 18. 17. 18. 18. 18. 19. 20. 17. 19. 19.
+ 19. 17. 19. 18. 18. 19. 19. 19. 17. 19. 18. 18. 18. 17. 18. 19. 18. 18.
+ 18. 18. 18. 19. 19. 17. 19. 18. 18. 20.]
+optimal QP (chrominance): [100.  26.  21.  17.  19.  18.  17.  17.  26.  18.  18.  18.  17.  18.
+  16.  17.  21.  18.  17.  17.  17.  17.  17.  17.  17.  18.  19.  16.
+  17.  17.  18.  17.  18.  17.  17.  17.  17.  17.  18.  17.  18.  17.
+  17.  18.  17.  16.  17.  17.  18.  18.  16.  16.  17.  18.  17.  17.
+  17.  17.  17.  17.  17.  18.  16.  18.]
+  SV=3.1	MSE=376.2386	rate=8.0491
+  SV=3.5	MSE=477.0529	rate=7.5033
+  SV=4	MSE=623.9762	rate=6.9383
+  SV=5	MSE=971.5384	rate=6.1376
+  SV=6	MSE=1391.6709	rate=5.5398
+  SV=7.7	MSE=2239.7278	rate=4.8383
+
+[stderr]
+C:\Users\SSAFY\Desktop\git_upload\jpeg-dct-compression\src\rate_distortion.py:98: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+  plt.show()

@@ -1,0 +1,13 @@
+Split into 4096 blocks of shape (8, 8, 3)
+
+QP sweep (QP, MSE, rate):
+  1	66.3370	6.1447
+  2	72.1399	4.5164
+  3	79.5474	3.9904
+  5	89.1209	3.5833
+  10	122.7653	3.2905
+  20	244.4731	3.1435
+
+[stderr]
+C:\Users\SSAFY\Desktop\git_upload\jpeg-dct-compression\src\rate_distortion.py:98: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+  plt.show()
