@@ -1,9 +1,8 @@
 """Regenerate every committed artifact under ``results/`` in one command.
 
-The standard ``lena.bmp`` test image is not redistributed with this
-repository. To keep the pipeline reproducible with **no external data**, this
-script synthesizes a deterministic 512x512 test image (fixed seed) and runs
-all three experiments on it:
+To keep the pipeline reproducible with **no external data**, this script
+synthesizes a deterministic 512x512 test image (fixed seed) and runs all
+three experiments on it:
 
 * ``results/input_synthetic.png``   -- the generated 512x512 test image
 * ``results/01_subband_transform.log``

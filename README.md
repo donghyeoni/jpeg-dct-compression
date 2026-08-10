@@ -49,17 +49,13 @@ runs the full chain **2-D DCT -> quantize (standard JPEG luminance/chrominance
 tables) -> zig-zag -> unary-encode**, and the inverse. QP is swept, the full
 image is rebuilt at each QP, and the rate-distortion curve is plotted.
 
-## Dataset
+## Test image
 
-The project was originally developed against the standard **Lena** test image
-(`lena.bmp`, 512x512 color). That image has historically restricted /
-ambiguous licensing and is **not redistributed here**.
-
-To keep the pipeline **reproducible with no external data**, `run_all.py`
-synthesizes a deterministic 512x512 test image (fixed seed) and runs all three
-experiments on it — the committed results under `results/` are produced this
-way. You can still pass any 512x512 color image via `--image <path>` (e.g. your
-own `data/lena.bmp`) to reproduce the original-style curves.
+No dataset is required. `run_all.py` synthesizes a deterministic 512x512 test
+image (fixed seed) and the committed synthetic input lives at
+`results/input_synthetic.png`, which the experiment scripts use by default. To
+run on a different picture, pass any 512x512 color image with
+`--image <path>`.
 
 ## Project structure
 
@@ -83,7 +79,6 @@ jpeg-dct-compression/
 ├── run_all.py              # synthesize a 512x512 image + run all 3 experiments -> results/
 ├── results/                # committed artifacts (logs, RD-curve PNGs, synthetic input)
 ├── docs/                   # project report (PDF)
-├── data/                   # optional: drop your own lena.bmp here (not tracked)
 ├── requirements.txt
 ├── RESULTS.md
 └── README.md
@@ -98,28 +93,25 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-Optionally, place your own 512x512 color test image (e.g. `lena.bmp`) in
-`data/` — by default everything runs on a generated synthetic image.
-
 ## Usage
 
-Reproduce everything under `results/` on a synthetic image (no data needed):
+Reproduce everything under `results/` on the synthetic image (no data needed):
 
 ```bash
 python run_all.py
 ```
 
-Or run experiments individually on your own image:
+Or run experiments individually (add `--image <path>` to use your own image):
 
 ```bash
 # 1. Subband transform: reconstruction MSE for both orders
-python experiments/01_subband_transform.py --image data/lena.bmp --levels 3
+python experiments/01_subband_transform.py --levels 3
 
 # 2. Subband compression: single-QP report, QP sweep, optimal-QP search
-python experiments/02_subband_compression.py --image data/lena.bmp --save-dir results
+python experiments/02_subband_compression.py --save-dir results
 
 # 3. Block-DCT JPEG: QP sweep and RD curve
-python experiments/03_block_dct_jpeg.py --image data/lena.bmp --save-dir results
+python experiments/03_block_dct_jpeg.py --save-dir results
 ```
 
 Common flags: `--no-plot` skips plotting entirely, and `--save-dir <dir>`

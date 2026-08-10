@@ -6,7 +6,7 @@ zig-zag -> unary-encode, and the inverse. Sweeps a list of QP values, rebuilds
 the full image at each QP, and plots the rate-distortion curve.
 
 Usage:
-    python experiments/03_block_dct_jpeg.py --image data/lena.bmp
+    python experiments/03_block_dct_jpeg.py
 """
 
 import argparse
@@ -26,7 +26,7 @@ QP_VALUES = [1, 2, 3, 5, 10, 20]
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--image", default="data/lena.bmp", help="Path to a 512x512 color image")
+    parser.add_argument("--image", default="results/input_synthetic.png", help="Path to a 512x512 color image")
     parser.add_argument("--no-plot", action="store_true", help="Skip RD-curve plotting")
     parser.add_argument("--save-dir", default=None, help="Directory to save the RD-curve PNG")
     args = parser.parse_args()

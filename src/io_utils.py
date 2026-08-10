@@ -12,16 +12,15 @@ def load_image(path, color_space="rgb"):
     Parameters
     ----------
     path : str
-        Path to the image file supplied by the user (see the Dataset section of
-        the README).
+        Path to the image file.
     color_space : {"rgb", "yuv", "gray"}
         Target color space. ``"gray"`` returns an ``int32`` ``(H, W, 1)`` array;
         the others return ``float32`` ``(H, W, 3)`` arrays.
     """
     if not os.path.exists(path):
         raise FileNotFoundError(
-            f"Image not found: {path}. Place your own lena.bmp under data/ "
-            "(the image is not redistributed with this repository)."
+            f"Image not found: {path}. Pass any 512x512 color image via "
+            "--image, or run run_all.py to generate the synthetic input."
         )
     image = cv2.imread(path, cv2.IMREAD_COLOR)
     if image is None:
