@@ -1,5 +1,7 @@
 """Rate-distortion sweeps, RD-curve plotting, and optimal-QP search."""
 
+import os
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -98,6 +100,9 @@ def plot_rd_curve(rate_list, distortion_list, labels=None, label_prefix="QP",
     plt.title(title)
     plt.grid(True)
     if save_path:
+        save_dir = os.path.dirname(save_path)
+        if save_dir:
+            os.makedirs(save_dir, exist_ok=True)
         plt.savefig(save_path, dpi=150, bbox_inches="tight")
         plt.close()
     else:

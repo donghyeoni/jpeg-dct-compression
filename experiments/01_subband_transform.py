@@ -22,7 +22,7 @@ from src.metrics import calculate_mse
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--image", default="results/input_synthetic.png", help="Path to a 512x512 color image")
+    parser.add_argument("--image", default="assets/input_synthetic.png", help="Path to a 512x512 color image")
     parser.add_argument("--levels", type=int, default=3, help="Decomposition levels per direction")
     args = parser.parse_args()
 

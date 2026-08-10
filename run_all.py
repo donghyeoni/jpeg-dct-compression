@@ -1,13 +1,17 @@
-"""Regenerate every committed artifact under ``results/`` in one command.
+"""Run all three experiments in one command.
 
 To keep the pipeline reproducible with **no external data**, this script
 synthesizes a deterministic 512x512 test image (fixed seed) and runs all
-three experiments on it:
+three experiments on it, writing everything to the untracked ``results/``
+directory:
 
 * ``results/input_synthetic.png``   -- the generated 512x512 test image
 * ``results/01_subband_transform.log``
 * ``results/02_subband_compression.log`` + ``rd_subband_qp.png`` / ``rd_subband_scaled.png``
 * ``results/03_block_dct_jpeg.log``      + ``rd_block_dct.png``
+
+The committed figures under ``assets/`` (shown in the README) were produced
+this way; regenerating them yields identical numbers.
 
 Usage
 -----
