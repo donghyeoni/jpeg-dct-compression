@@ -51,10 +51,9 @@ image is rebuilt at each QP, and the rate-distortion curve is plotted.
 
 ## Test image
 
-No dataset is required. The committed test input is a deterministic synthetic
-512x512 image ([`assets/input_synthetic.png`](assets/input_synthetic.png),
-generated with a fixed seed by `run_all.py`), which the experiment scripts use
-by default. To run on a different picture, pass any 512x512 color image with
+No dataset is required. The committed test input is a 512x512 food photograph
+([`assets/food.jpg`](assets/food.jpg)), which the experiment scripts use by
+default. To run on a different picture, pass any 512x512 color image with
 `--image <path>`.
 
 ## Project structure
@@ -76,8 +75,8 @@ jpeg-dct-compression/
 │   ├── 01_subband_transform.py
 │   ├── 02_subband_compression.py
 │   └── 03_block_dct_jpeg.py
-├── run_all.py              # synthesize a 512x512 image + run all 3 experiments -> results/
-├── assets/                 # committed figures: synthetic input + RD curves (shown below)
+├── run_all.py              # run all 3 experiments on the test image -> results/
+├── assets/                 # committed test image + RD-curve figures (shown below)
 ├── docs/                   # project report (PDF)
 ├── requirements.txt
 └── README.md
@@ -97,7 +96,7 @@ pip install -r requirements.txt
 
 ## Usage
 
-Reproduce everything under `results/` on the synthetic image (no data needed):
+Reproduce everything under `results/` on the committed test image:
 
 ```bash
 python run_all.py
@@ -121,8 +120,8 @@ saves the RD-curve PNGs instead of displaying them interactively.
 
 ## Results
 
-All numbers and figures below come from `python run_all.py` on the synthetic
-test image.
+All numbers and figures below come from `python run_all.py` on the test
+image.
 
 ### 1. Subband transform — invertibility
 
@@ -142,24 +141,24 @@ Flat unit quantization tables with a single QP for every subband:
 
 | QP | MSE | rate (bpp) |
 | --- | --- | --- |
-| 139 | 1548.6 | 7.07 |
-| 160 | 1968.3 | 6.40 |
-| 192 | 2576.8 | 5.67 |
-| 240 | 3326.4 | 4.96 |
-| 310 | 4056.0 | 4.39 |
-| 450 | 4750.3 | 3.89 |
+| 139 | 489.4 | 6.42 |
+| 160 | 606.4 | 5.96 |
+| 192 | 798.1 | 5.44 |
+| 240 | 1102.7 | 4.93 |
+| 310 | 1559.1 | 4.47 |
+| 450 | 2464.8 | 3.98 |
 
 Per-subband optimal QPs (minimizing `cost = alpha * MSE + beta * rate`),
 scaled by a factor `SV` — much lower MSE at comparable rates:
 
 | SV | MSE | rate (bpp) |
 | --- | --- | --- |
-| 3.1 | 376.2 | 8.05 |
-| 3.5 | 477.1 | 7.50 |
-| 4.0 | 624.0 | 6.94 |
-| 5.0 | 971.5 | 6.14 |
-| 6.0 | 1391.7 | 5.54 |
-| 7.7 | 2239.7 | 4.84 |
+| 3.1 | 248.6 | 5.90 |
+| 3.5 | 307.8 | 5.56 |
+| 4.0 | 388.0 | 5.23 |
+| 5.0 | 568.6 | 4.76 |
+| 6.0 | 823.3 | 4.45 |
+| 7.7 | 1275.7 | 4.11 |
 
 ![subband QP sweep](assets/rd_subband_qp.png)
 ![subband scaled RD](assets/rd_subband_scaled.png)
@@ -170,12 +169,12 @@ Textbook 8x8 block DCT with the standard JPEG luminance/chrominance tables:
 
 | QP | MSE | rate (bpp) |
 | --- | --- | --- |
-| 1 | 66.3 | 6.14 |
-| 2 | 72.1 | 4.52 |
-| 3 | 79.5 | 3.99 |
-| 5 | 89.1 | 3.58 |
-| 10 | 122.8 | 3.29 |
-| 20 | 244.5 | 3.14 |
+| 1 | 17.1 | 6.34 |
+| 2 | 29.4 | 4.66 |
+| 3 | 38.1 | 4.09 |
+| 5 | 57.6 | 3.65 |
+| 10 | 117.5 | 3.31 |
+| 20 | 255.5 | 3.15 |
 
 ![block DCT RD](assets/rd_block_dct.png)
 

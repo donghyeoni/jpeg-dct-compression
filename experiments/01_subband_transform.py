@@ -1,4 +1,4 @@
-"""Experiment 1: sum/difference (Haar-like) subband transform.
+﻿"""Experiment 1: sum/difference (Haar-like) subband transform.
 
 Performs a 3-level sum/difference decomposition of the input image in both
 orders (horizontal-first and vertical-first), reconstructs, and reports the
@@ -22,7 +22,7 @@ from src.metrics import calculate_mse
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--image", default="assets/input_synthetic.png", help="Path to a 512x512 color image")
+    parser.add_argument("--image", default="assets/food.jpg", help="Path to a 512x512 color image")
     parser.add_argument("--levels", type=int, default=3, help="Decomposition levels per direction")
     args = parser.parse_args()
 

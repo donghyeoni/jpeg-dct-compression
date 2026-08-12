@@ -1,4 +1,4 @@
-"""Experiment 2: subband compression with QP sweep and optimal-QP search.
+﻿"""Experiment 2: subband compression with QP sweep and optimal-QP search.
 
 Takes the 3-level (vertical-then-horizontal) decomposition of the input image
 in YUV, giving 64 sub-images of size 64x64. Each channel of each sub-image is
@@ -40,7 +40,7 @@ SCALING_VALUES = [3.1, 3.5, 4, 5, 6, 7.7]
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--image", default="assets/input_synthetic.png", help="Path to a 512x512 color image")
+    parser.add_argument("--image", default="assets/food.jpg", help="Path to a 512x512 color image")
     parser.add_argument("--single-qp", type=float, default=100, help="QP for the single-point report")
     parser.add_argument("--no-plot", action="store_true", help="Skip RD-curve plotting")
     parser.add_argument("--save-dir", default=None, help="Directory to save RD-curve PNGs")

@@ -20,7 +20,7 @@ def load_image(path, color_space="rgb"):
     if not os.path.exists(path):
         raise FileNotFoundError(
             f"Image not found: {path}. Pass any 512x512 color image via "
-            "--image, or run run_all.py to generate the synthetic input."
+            "--image (the default test image is assets/food.jpg)."
         )
     image = cv2.imread(path, cv2.IMREAD_COLOR)
     if image is None:
