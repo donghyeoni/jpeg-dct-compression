@@ -16,67 +16,38 @@
 
 rate는 전체 부호 길이를 512 × 512로 나눈 값, distortion은 복원 영상과 입력 영상의 MSE다(실험 1은 RGB, 실험 2·3은 YUV).
 
-<div align="center">
-
-<img src="assets/food.jpg" alt="입력 영상" width="320">
-
-</div>
-
 ## 결과
+
+실험별 단계 영상이다. 서브밴드 압축과 블록 DCT 그림의 아래 줄은 같은 영역(128×128)을 확대한 것이다. 전체 수치와
+rate-distortion 곡선은 로그에 있다.
 
 ### 서브밴드 변환
 
-| 순서 | 복원 MSE |
-| --- | --- |
-| 가로 먼저 | 0.0 |
-| 세로 먼저 | 0.0 |
+<div align="center">
+
+<img src="assets/stage_subband_transform.png" alt="서브밴드 변환 단계" width="900">
+
+*입력, 세로 먼저 3단계 분해한 서브밴드 64개(G 채널, 대역마다 log |값|을 정규화), 역변환 결과.*
+
+</div>
 
 ### 서브밴드 압축
 
-모든 서브밴드·채널에 같은 QP:
-
-| QP | MSE | rate (bpp) |
-| --- | --- | --- |
-| 139 | 7.99 | 6.42 |
-| 160 | 9.63 | 5.96 |
-| 192 | 12.47 | 5.44 |
-| 240 | 17.49 | 4.93 |
-| 310 | 24.71 | 4.47 |
-| 450 | 38.69 | 3.98 |
-
-서브밴드·채널별 최적 QP(`cost = 0.05 × MSE + 0.95 × rate` 최소)에 SV를 곱한 결과. 최적 QP 표는 로그에 있다.
-
-| SV | MSE | rate (bpp) |
-| --- | --- | --- |
-| 3.1 | 4.55 | 5.86 |
-| 3.5 | 5.65 | 5.52 |
-| 4 | 6.93 | 5.19 |
-| 5 | 9.85 | 4.73 |
-| 6 | 13.80 | 4.43 |
-| 7.7 | 20.52 | 4.09 |
-
 <div align="center">
 
-<img src="assets/rd_subband_qp.png" alt="서브밴드 QP 스윕" width="620">
+<img src="assets/stage_subband_compression.png" alt="서브밴드 압축 복원 영상" width="900">
 
-<img src="assets/rd_subband_scaled.png" alt="서브밴드 최적 QP 스케일" width="620">
+*입력, 모든 서브밴드에 QP 139와 450, 서브밴드·채널별 최적 QP × SV 7.7로 압축한 뒤 복원한 영상.*
 
 </div>
 
 ### 블록 DCT JPEG
 
-| QP | MSE | rate (bpp) |
-| --- | --- | --- |
-| 1 | 15.56 | 4.18 |
-| 2 | 26.25 | 3.58 |
-| 3 | 35.36 | 3.39 |
-| 5 | 53.75 | 3.23 |
-| 10 | 108.30 | 3.11 |
-| 20 | 234.44 | 3.05 |
-
 <div align="center">
 
-<img src="assets/rd_block_dct.png" alt="블록 DCT QP 스윕" width="620">
+<img src="assets/stage_block_dct.png" alt="블록 DCT 복원 영상" width="900">
+
+*Y 채널 8×8 블록 DCT 계수(−128 이동 후, log |계수|), QP 1, 5, 20으로 압축한 뒤 복원한 영상.*
 
 </div>
 
