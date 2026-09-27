@@ -19,12 +19,12 @@ def split_image_into_blocks(image, block_size):
 def restore_image_from_blocks(block_list, image_size=512, block_size=8, channels=3):
     """Reassemble a row-major list of blocks into a full image.
 
-    The output dtype is ``uint8`` to match the original pipeline.
+    Values are rounded and clipped to ``[0, 255]`` and returned as ``uint8``.
     """
-    restored = np.zeros((image_size, image_size, channels), dtype=np.uint8)
+    restored = np.zeros((image_size, image_size, channels))
     idx = 0
     for y in range(0, image_size, block_size):
         for x in range(0, image_size, block_size):
             restored[y:y + block_size, x:x + block_size, :] = block_list[idx]
             idx += 1
-    return restored
+    return np.clip(np.round(restored), 0, 255).astype(np.uint8)

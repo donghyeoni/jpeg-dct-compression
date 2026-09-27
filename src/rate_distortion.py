@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from .jpeg_codec import image_compress, image_decompress
-from .entropy import count_bits
+from .entropy import count_bits, unary_length
 from .metrics import calculate_mse, calculate_list_mse
 
 TOTAL_PIXELS = 512 * 512  # rate is normalized by the full-image pixel count
@@ -24,9 +24,9 @@ def sweep_blocks(blocks, luminance_table, chrominance_table, QP_values,
 
     * If ``reconstruct_fn`` and ``reference`` are given, the restored blocks are
       reassembled into a full image via ``reconstruct_fn`` and compared to
-      ``reference`` with MSE (block-DCT JPEG pipeline).
+      ``reference`` with MSE (both experiment pipelines).
     * Otherwise, the MSE is taken directly between the stacks of original and
-      restored blocks (subband compression pipeline).
+      restored blocks.
 
     Returns
     -------
@@ -59,26 +59,22 @@ def sweep_blocks(blocks, luminance_table, chrominance_table, QP_values,
 
 
 def find_optimal_qp(subbands, quant_table, channel, qp_range=range(1, 300),
-                    alpha=0.05, beta=0.95, block_size=64, use_dct=False):
+                    alpha=0.05, beta=0.95, block_size=64):
     """Per-subband QP that minimizes ``cost = alpha * MSE + beta * rate``.
 
     Searches ``qp_range`` for a single channel index (0=Y, 1=U, 2=V) across all
     subbands. Returns an array of the optimal QP per subband.
     """
+    qps = np.array(list(qp_range))
+    steps = quant_table * qps[:, None, None]
     optimal = np.zeros(len(subbands))
     for j, sub in enumerate(subbands):
-        min_cost = float("inf")
-        best_qp = None
-        for qp in qp_range:
-            compressed = image_compress(sub[:, :, channel], quant_table, qp, use_dct)
-            decompressed = image_decompress(compressed, quant_table, qp, use_dct, block_size)
-            mse_value = calculate_mse(sub[:, :, channel], decompressed)
-            rate = count_bits(compressed) / (block_size * block_size)
-            cost = alpha * mse_value + beta * rate
-            if cost < min_cost:
-                min_cost = cost
-                best_qp = qp
-        optimal[j] = best_qp
+        band = sub[:, :, channel]
+        quantized = np.round(band / steps).astype(int)
+        restored = quantized.astype(float) * steps
+        mse = ((band - restored) ** 2).mean(axis=(1, 2))
+        rate = unary_length(quantized, axis=(1, 2)) / (block_size * block_size)
+        optimal[j] = qps[np.argmin(alpha * mse + beta * rate)]
     return optimal
 
 

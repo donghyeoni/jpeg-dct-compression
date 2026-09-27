@@ -1,9 +1,10 @@
 ﻿"""Experiment 3: textbook block-DCT JPEG codec with a QP sweep.
 
 Splits the input image (YUV) into 8x8 blocks, then for each block applies the
-full JPEG chain: 2-D DCT -> quantize (standard luminance/chrominance tables) ->
-zig-zag -> unary-encode, and the inverse. Sweeps a list of QP values, rebuilds
-the full image at each QP, and plots the rate-distortion curve.
+full JPEG chain: level shift (-128) -> 2-D DCT -> quantize (standard
+luminance/chrominance tables) -> zig-zag -> unary-encode, and the inverse.
+Sweeps a list of QP values, rebuilds the full image at each QP (rounded and
+clipped to [0, 255]), and plots the rate-distortion curve.
 
 Usage:
     python experiments/03_block_dct_jpeg.py
@@ -21,6 +22,7 @@ from src.quantization import LUMINANCE_QUANT_TABLE, CHROMINANCE_QUANT_TABLE
 from src.rate_distortion import sweep_blocks, plot_rd_curve
 
 BLOCK = 8
+LEVEL_SHIFT = 128
 QP_VALUES = [1, 2, 3, 5, 10, 20]
 
 
@@ -32,11 +34,11 @@ def main():
     args = parser.parse_args()
 
     image_yuv = load_image(args.image, color_space="yuv")
-    blocks = split_image_into_blocks(image_yuv, BLOCK)
+    blocks = split_image_into_blocks(image_yuv - LEVEL_SHIFT, BLOCK)
     print(f"Split into {len(blocks)} blocks of shape {blocks[0].shape}")
 
     def reconstruct_fn(restored_blocks):
-        return restore_image_from_blocks(restored_blocks, image_size=512,
+        return restore_image_from_blocks([b + LEVEL_SHIFT for b in restored_blocks], image_size=512,
                                          block_size=BLOCK, channels=3)
 
     rate_list, distortion_list = sweep_blocks(

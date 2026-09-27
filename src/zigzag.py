@@ -5,34 +5,33 @@ subband images. ``inverse_zigzag`` needs the block size explicitly since it
 must allocate the output grid.
 """
 
+from functools import lru_cache
+
 import numpy as np
+
+
+@lru_cache(maxsize=None)
+def _scan_order(rows, cols):
+    order_r, order_c = [], []
+    for d in range(rows + cols - 1):
+        if d % 2 == 1:
+            for i in range(max(0, d - cols + 1), min(d + 1, rows)):
+                order_r.append(i)
+                order_c.append(d - i)
+        else:
+            for i in range(max(0, d - rows + 1), min(d + 1, cols)):
+                order_r.append(d - i)
+                order_c.append(i)
+    return np.array(order_r), np.array(order_c)
 
 
 def zigzag(image):
     """Flatten a 2-D array into a 1-D array using a diagonal zig-zag scan."""
-    rows, cols = image.shape
-    result = []
-    for d in range(rows + cols - 1):
-        if d % 2 == 1:  # odd diagonal: bottom-up
-            for i in range(max(0, d - cols + 1), min(d + 1, rows)):
-                result.append(image[i, d - i])
-        else:  # even diagonal: top-down
-            for i in range(max(0, d - rows + 1), min(d + 1, cols)):
-                result.append(image[d - i, i])
-    return np.array(result)
+    return image[_scan_order(*image.shape)]
 
 
 def inverse_zigzag(arr, size=8):
     """Rebuild a ``(size, size)`` array from a zig-zag scanned 1-D array."""
     result = np.zeros((size, size), dtype=float)
-    index = 0
-    for d in range(size + size - 1):
-        if d % 2 == 1:  # odd diagonal: bottom-up
-            for i in range(max(0, d - size + 1), min(d + 1, size)):
-                result[i, d - i] = arr[index]
-                index += 1
-        else:  # even diagonal: top-down
-            for i in range(max(0, d - size + 1), min(d + 1, size)):
-                result[d - i, i] = arr[index]
-                index += 1
+    result[_scan_order(size, size)] = arr[:size * size]
     return result

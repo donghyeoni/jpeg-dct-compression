@@ -12,26 +12,21 @@ import numpy as np
 
 def unary_encode(zigzag_result):
     """Encode a sequence of integers as a list of unary code strings."""
-    unary_encoded = []
-    for value in zigzag_result:
-        if value >= 0:
-            unary_encoded.append("1" * value + "0")
-        else:
-            unary_encoded.append("1" * abs(value) + "0" + "-")
-    return unary_encoded
+    return ["1" * v + "0" if v >= 0 else "1" * -v + "0-" for v in np.asarray(zigzag_result).tolist()]
 
 
 def unary_decode(compressed_image):
     """Inverse of :func:`unary_encode`."""
-    decoded = []
-    for code in compressed_image:
-        if code.endswith("-"):
-            decoded.append(-(len(code) - 2))
-        else:
-            decoded.append(len(code) - 1)
-    return np.array(decoded)
+    return np.array([-(len(code) - 2) if code.endswith("-") else len(code) - 1
+                     for code in compressed_image])
 
 
 def count_bits(compressed):
     """Total number of characters (bits) across a list of unary codes."""
-    return sum(len(code) for code in compressed)
+    return sum(map(len, compressed))
+
+
+def unary_length(values, axis=None):
+    values = np.asarray(values)
+    n = values.size if axis is None else int(np.prod([values.shape[a] for a in axis]))
+    return np.abs(values).sum(axis=axis) + n + (values < 0).sum(axis=axis)

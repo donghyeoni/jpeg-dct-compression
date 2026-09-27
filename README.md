@@ -6,7 +6,7 @@ Lossy image compression on a 512x512 test image, comparing a
 **custom sum/difference subband decomposition** against a **textbook block-DCT
 JPEG pipeline**. The full coding chain is implemented from scratch: transform,
 quantization, zig-zag scan, unary entropy coding, and the exact inverse. QP is
-swept to plot rate-distortion curves (bits-per-pixel vs MSE), and a per-block
+swept to plot rate-distortion curves (bits-per-pixel vs MSE), and a per-subband
 optimal-QP search minimizes a rate-distortion cost.
 
 ## Overview
@@ -36,18 +36,21 @@ Implemented in `src/subband.py`.
 Uses the 3-level (vertical-then-horizontal) decomposition to produce 64 sub-images
 of size `64 x 64`, in YUV. Each channel of each sub-image is compressed with
 **quantize -> zig-zag -> unary-encode** (using flat *unit* quantization tables,
-so QP alone sets the step size) and then decoded. The script reports rate and
-distortion at a single QP, sweeps a list of QP values to plot a rate-distortion
-curve, and searches for the **optimal per-subband QP** that minimizes
-`cost = alpha * MSE + beta * rate`, then plots an RD curve as those QPs are
-scaled. **No DCT** is used in this pipeline.
+so QP alone sets the step size) and then decoded. The decoded subbands are
+reconstructed into an image (clipped to `[0, 255]`), and distortion is the MSE
+against the input image. The script reports rate and distortion at a single
+QP, sweeps a list of QP values to plot a rate-distortion curve, and searches
+for the **optimal per-subband QP** of each channel (Y, U, V) that minimizes
+`cost = alpha * MSE + beta * rate` on that subband, then plots an RD curve as
+those QPs are scaled. **No DCT** is used in this pipeline.
 
 ### 3. Block-DCT JPEG (`experiments/03_block_dct_jpeg.py`)
 
 A true JPEG-style codec. The image (YUV) is split into `8 x 8` blocks; each block
-runs the full chain **2-D DCT -> quantize (standard JPEG luminance/chrominance
-tables) -> zig-zag -> unary-encode**, and the inverse. QP is swept, the full
-image is rebuilt at each QP, and the rate-distortion curve is plotted.
+runs the full chain **level shift (-128) -> 2-D DCT -> quantize (standard JPEG
+luminance/chrominance tables) -> zig-zag -> unary-encode**, and the inverse. QP
+is swept, the full image is rebuilt at each QP (rounded and clipped to
+`[0, 255]`), and the rate-distortion curve is plotted.
 
 ## Test image
 
@@ -75,15 +78,11 @@ jpeg-dct-compression/
 │   ├── 01_subband_transform.py
 │   ├── 02_subband_compression.py
 │   └── 03_block_dct_jpeg.py
-├── run_all.py              # run all 3 experiments on the test image -> results/
 ├── assets/                 # committed test image + RD-curve figures (shown below)
 ├── docs/                   # project report (PDF)
 ├── requirements.txt
 └── README.md
 ```
-
-Running `run_all.py` writes its logs and figures to an untracked `results/`
-directory.
 
 ## Setup
 
@@ -96,13 +95,7 @@ pip install -r requirements.txt
 
 ## Usage
 
-Reproduce everything under `results/` on the committed test image:
-
-```bash
-python run_all.py
-```
-
-Or run experiments individually (add `--image <path>` to use your own image):
+Run the experiments (add `--image <path>` to use your own image):
 
 ```bash
 # 1. Subband transform: reconstruction MSE for both orders
@@ -120,8 +113,7 @@ saves the RD-curve PNGs instead of displaying them interactively.
 
 ## Results
 
-All numbers and figures below come from `python run_all.py` on the test
-image.
+All numbers and figures below are from the test image.
 
 ### 1. Subband transform — invertibility
 
@@ -133,62 +125,56 @@ reconstructed:
 | horizontal-first | 0.0 |
 | vertical-first | 0.0 |
 
-The transform is perfectly invertible on the test image.
-
 ### 2. Subband compression — rate-distortion
 
 Flat unit quantization tables with a single QP for every subband:
 
 | QP | MSE | rate (bpp) |
 | --- | --- | --- |
-| 139 | 489.4 | 6.42 |
-| 160 | 606.4 | 5.96 |
-| 192 | 798.1 | 5.44 |
-| 240 | 1102.7 | 4.93 |
-| 310 | 1559.1 | 4.47 |
-| 450 | 2464.8 | 3.98 |
+| 139 | 7.99 | 6.42 |
+| 160 | 9.63 | 5.96 |
+| 192 | 12.47 | 5.44 |
+| 240 | 17.49 | 4.93 |
+| 310 | 24.71 | 4.47 |
+| 450 | 38.69 | 3.98 |
 
-Per-subband optimal QPs (minimizing `cost = alpha * MSE + beta * rate`),
-scaled by a factor `SV` — much lower MSE at comparable rates:
+Per-subband optimal QPs of each channel (minimizing
+`cost = alpha * MSE + beta * rate`), scaled by a factor `SV`:
 
 | SV | MSE | rate (bpp) |
 | --- | --- | --- |
-| 3.1 | 248.6 | 5.90 |
-| 3.5 | 307.8 | 5.56 |
-| 4.0 | 388.0 | 5.23 |
-| 5.0 | 568.6 | 4.76 |
-| 6.0 | 823.3 | 4.45 |
-| 7.7 | 1275.7 | 4.11 |
+| 3.1 | 4.55 | 5.86 |
+| 3.5 | 5.65 | 5.52 |
+| 4.0 | 6.93 | 5.19 |
+| 5.0 | 9.85 | 4.73 |
+| 6.0 | 13.80 | 4.43 |
+| 7.7 | 20.52 | 4.09 |
 
 ![subband QP sweep](assets/rd_subband_qp.png)
 ![subband scaled RD](assets/rd_subband_scaled.png)
 
 ### 3. Block-DCT JPEG — rate-distortion
 
-Textbook 8x8 block DCT with the standard JPEG luminance/chrominance tables:
+8x8 block DCT with level shift and the standard JPEG luminance/chrominance
+tables:
 
 | QP | MSE | rate (bpp) |
 | --- | --- | --- |
-| 1 | 17.1 | 6.34 |
-| 2 | 29.4 | 4.66 |
-| 3 | 38.1 | 4.09 |
-| 5 | 57.6 | 3.65 |
-| 10 | 117.5 | 3.31 |
-| 20 | 255.5 | 3.15 |
+| 1 | 15.56 | 4.18 |
+| 2 | 26.25 | 3.58 |
+| 3 | 35.36 | 3.39 |
+| 5 | 53.75 | 3.23 |
+| 10 | 108.30 | 3.11 |
+| 20 | 234.44 | 3.05 |
 
 ![block DCT RD](assets/rd_block_dct.png)
 
-The block-DCT JPEG pipeline reaches far lower MSE at low bit-rates than the
-flat subband scheme, as expected — the DCT concentrates energy into few
-coefficients.
-
 ## Notes
 
-- The subband transform uses integer arithmetic with `// 2` in the inverse, so
-  reconstruction is near-lossless but not guaranteed bit-exact for odd values.
+- The subband transform uses integer arithmetic with `// 2` in the inverse;
+  for integer inputs `a + b` and `a - b` have the same parity, so
+  reconstruction is exact.
 - Unary coding here is a simple variable-length scheme, not an optimal entropy
   coder; its total code length is used only as a bit-rate estimate. Rate is
   normalized by `512 * 512` pixels throughout.
-- The optimal-QP search in experiment 2 scans hundreds of QP values per subband
-  and is the slowest step of `run_all.py`.
 - A project report is in `docs/`.
